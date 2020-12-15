@@ -40,24 +40,31 @@ contract Ballot =
         put(state{voters[Call.caller].vote = proposalNum})
 
         put(state{proposals[proposalNum].voteCount = state.proposals[proposalNum].voteCount+1})
+        if(state.winningProposal == 0)
+            put(state{winningProposal = proposalNum})
+        else if(state.proposals[proposalNum].voteCount > state.proposals[state.winningProposal].voteCount)
+            put(state{winningProposal = proposalNum})
         true
     
     stateful entrypoint winningProposal(): string = 
-        findMax(1, 0)
         let winningProposal = state.winningProposal
         state.proposals[winningProposal].name
 
 
     stateful entrypoint getProposalDetails(num: int) : proposal =
         state.proposals[num]
+
     
-    stateful function findMax(pos: int, maxValue: int) = 
-        require(pos < state.index+1, "Iteration index cannot be greater than the total number of proposals")
-        let max = maxValue
-        if(state.proposals[pos].voteCount > maxValue)
-            let max = state.proposals[pos].voteCount
-            put(state{winningProposal = pos})
-        findMax(pos+1, max)
+    // stateful function findMax(pos: int, maxValue: int): bool = 
+    //     let max = maxValue
+    //     if(pos > state.index+1)
+    //         false
+    //     else 
+    //         if(state.proposals[pos].voteCount > maxValue)
+    //             let max = state.proposals[pos].voteCount
+    //             put(state{winningProposal = pos})
+    //         true
+    //     findMax(pos+1, max)
         // else
         //     findMax(pos+1, maxValue)
 
